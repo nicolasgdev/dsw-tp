@@ -1,0 +1,24 @@
+### get all users
+
+GET http://localhost:3000/api/users
+
+
+### get user by name
+GET http://localhost:3000/api/users/1
+
+### create new user
+POST http://localhost:3000/api/users
+Content-Type: application/json 
+
+{
+  "id": "40",
+  "dni": "84959",
+  "name": "Adam",
+  "surname": "Gontier",
+  "email": "ag3dg@gmail.com"
+}
+  
+
+
+### delete user
+DELETE 
