@@ -31,6 +31,26 @@ app.post('/api/users', (req, res) => {
   res.status(201).send({ message: 'User created' });
 });
 
+app.put('/api/users/:id', (req, res) => {
+  const userId = users.findIndex((user) => user.id === req.params.id);
+
+  if (userId === -1) {
+    res.status(404).send({ message: 'User not found' });
+  }
+  const input = {
+    id: req.body.id,
+    dni: req.body.dni,
+    name: req.body.name,
+    surname: req.body.surname,
+    email: req.body.email,
+  };
+  users[userId] = { ...users[userId], ...input };
+
+  res
+    .status(200)
+    .send({ message: 'User edited successfully!', data: users[userId] });
+});
+
 app.delete('/api/users/:id', (req, res) => {});
 
 app.listen(PORT, () => {

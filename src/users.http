@@ -19,6 +19,16 @@ Content-Type: application/json
 }
   
 
+### Edit/modify user (PUT - recurso completo)
+PUT http://localhost:3000/api/users/1
+Content-Type: application/json
+
+{
+  "dni": "4576 ",
+  "name": "Oliver",
+  "surname": "Sykes",
+  "email": "osbmth@gmail.com"
+}
 
 ### delete user
 DELETE 
