@@ -1,12 +1,15 @@
 import express, { NextFunction, Request, Response } from 'express';
 import dotenv from 'dotenv';
-import { User } from './user.js';
+import { User } from './user/user.entity.js';
+import { UserRepository } from './user/user.repository.js';
 
 dotenv.config();
 
 const app = express();
 app.use(express.json()); //Middleware
 const PORT = process.env.PORT;
+
+const repository = new UserRepository();
 
 const users = [new User('1', '182834', 'Matt', 'Tuck', 'bfmv@gmail.com')];
 
@@ -28,13 +31,14 @@ function sanitizeUserInput(req: Request, res: Response, next: NextFunction) {
 }
 
 app.get('/api/users', (req, res) => {
-  res.json({ data: users });
+  res.json({ data: repository.findAll() });
 });
 
 app.get('/api/users/:id', (req, res) => {
-  const user = users.find((user) => user.id === req.params.id);
+  const id = req.params.id;
+  const user = repository.findOne({ id });
   if (!user) {
-    return res.status(404).send({ message: 'user not found' });
+    return res.status(404).send({ message: 'User not found' });
   }
   res.json({ data: users });
 });
@@ -42,7 +46,7 @@ app.get('/api/users/:id', (req, res) => {
 app.post('/api/users', sanitizeUserInput, (req, res) => {
   const input = req.body.sanitizedInput;
 
-  const user = new User(
+  const userInput = new User(
     input.id,
     input.dni,
     input.name,
@@ -50,43 +54,39 @@ app.post('/api/users', sanitizeUserInput, (req, res) => {
     input.email
   );
 
-  users.push(user);
+  const user = repository.add(userInput);
   return res.status(201).send({ message: 'User created', data: user });
 });
 
 app.put('/api/users/:id', sanitizeUserInput, (req, res) => {
-  const userIdx = users.findIndex((user) => user.id === req.params.id);
+  req.body.sanitizedInput.id = req.params.id;
+  const user = repository.update(req.body.sanitizedInput);
 
-  if (userIdx === -1) {
+  if (!user) {
     return res.status(404).send({ message: 'User not found' });
   }
-  users[userIdx] = { ...users[userIdx], ...req.body.sanitizedInput };
 
-  res
-    .status(200)
-    .send({ message: 'User edited successfully!', data: users[userIdx] });
+  res.status(200).send({ message: 'User edited successfully!', data: user });
 });
 
 app.patch('/api/users/:id', sanitizeUserInput, (req, res) => {
-  const userIdx = users.findIndex((user) => user.id === req.params.id);
+  req.body.sanitizedInput.id = req.params.id;
+  const user = repository.update(req.body.sanitizedInput);
 
-  if (userIdx === -1) {
+  if (!user) {
     return res.status(404).send({ message: 'User not found' });
   }
 
-  Object.assign((users[userIdx], req.body.sanitizedInput));
-
-  return res
-    .status(200)
-    .send({ message: 'User edited successfully!', data: users[userIdx] });
+  res.status(200).send({ message: 'User edited successfully!', data: user });
 });
 
 app.delete('/api/users/:id', (req, res) => {
-  const userIdx = users.findIndex((user) => user.id === req.params.id);
-  if (userIdx === -1) {
+  const id = req.params.id;
+  const user = repository.delete({ id });
+
+  if (!user) {
     return res.status(404).send({ message: 'User not found' });
   }
-  users.splice(userIdx, 1);
   return res.status(200).send({ message: 'User deleted successfully' });
 });
 
