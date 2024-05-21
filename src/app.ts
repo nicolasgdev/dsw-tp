@@ -34,10 +34,9 @@ app.get('/api/users', (req, res) => {
 app.get('/api/users/:id', (req, res) => {
   const user = users.find((user) => user.id === req.params.id);
   if (!user) {
-    res.status(404).send({ message: 'user not found' });
-  } else {
-    res.json({ data: users });
+    return res.status(404).send({ message: 'user not found' });
   }
+  res.json({ data: users });
 });
 
 app.post('/api/users', sanitizeUserInput, (req, res) => {
@@ -52,32 +51,32 @@ app.post('/api/users', sanitizeUserInput, (req, res) => {
   );
 
   users.push(user);
-  res.status(201).send({ message: 'User created', data: user });
+  return res.status(201).send({ message: 'User created', data: user });
 });
 
 app.put('/api/users/:id', sanitizeUserInput, (req, res) => {
   const userIdx = users.findIndex((user) => user.id === req.params.id);
 
   if (userIdx === -1) {
-    res.status(404).send({ message: 'User not found' });
-  } else {
-    users[userIdx] = { ...users[userIdx], ...req.body.sanitizedInput };
-
-    res
-      .status(200)
-      .send({ message: 'User edited successfully!', data: users[userIdx] });
+    return res.status(404).send({ message: 'User not found' });
   }
+  users[userIdx] = { ...users[userIdx], ...req.body.sanitizedInput };
+
+  res
+    .status(200)
+    .send({ message: 'User edited successfully!', data: users[userIdx] });
 });
 
 app.patch('/api/users/:id', sanitizeUserInput, (req, res) => {
   const userIdx = users.findIndex((user) => user.id === req.params.id);
 
   if (userIdx === -1) {
-    res.status(404).send({ message: 'User not found' });
-  } else {
-    users[userIdx] = { ...users[userIdx], ...req.body.sanitizedInput };
+    return res.status(404).send({ message: 'User not found' });
   }
-  res
+
+  Object.assign((users[userIdx], req.body.sanitizedInput));
+
+  return res
     .status(200)
     .send({ message: 'User edited successfully!', data: users[userIdx] });
 });
@@ -85,11 +84,14 @@ app.patch('/api/users/:id', sanitizeUserInput, (req, res) => {
 app.delete('/api/users/:id', (req, res) => {
   const userIdx = users.findIndex((user) => user.id === req.params.id);
   if (userIdx === -1) {
-    res.status(404).send({ message: 'User not found' });
-  } else {
-    users.splice(userIdx, 1);
-    res.status(200).send({ message: 'User deleted successfully' });
+    return res.status(404).send({ message: 'User not found' });
   }
+  users.splice(userIdx, 1);
+  return res.status(200).send({ message: 'User deleted successfully' });
+});
+
+app.use((_, res) => {
+  res.status(404).send({ message: 'Resource not found' });
 });
 
 app.listen(PORT, () => {
