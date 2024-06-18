@@ -4,7 +4,7 @@ import { PriceSubscription } from './priceSubscription.entity.js';
 
 const date = new Date(2024, 5, 17);
 const price = new PriceSubscription('1', date, 100);
-const subscriptions = [new Subscription('1', date, price)];
+const subscriptions = [new Subscription('1', date, [price])];
 
 export class SubscriptionRepository implements Repository<Subscription> {
   public findAll(): Subscription[] | undefined {

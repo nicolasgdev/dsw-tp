@@ -3,12 +3,12 @@ import { PriceSubscriptionRepository } from './priceSubscription.repository.js';
 import { PriceSubscription } from './priceSubscription.entity.js';
 
 const repository = new PriceSubscriptionRepository();
-
+/*
 function sanitizePriceSubscriptionInput(req: Request, res: Response, next: NextFunction) {
   req.body.sanitizedInput = {
     id: req.body.id,
     dateStart: new Date(req.body.dateStart),
-    price : req.body.price,
+    price : parseInt(req.body.price, 10),//
   }; // Middleware
   //more checks here (content, type)
 
@@ -18,9 +18,47 @@ function sanitizePriceSubscriptionInput(req: Request, res: Response, next: NextF
   }); // Remove undefined
   next();
 }
+  */
+function sanitizePriceSubscriptionInput(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { id, dateStart, price } = req.body;
+
+    // Validación básica
+    
+    if (!id || !dateStart || !price) {
+      return res.status(400).send({ message: 'Invalid input data' });
+    }
+
+    // Verificación del tipo de datos
+    const parsedDateStart = new Date(dateStart);
+    const parsedPrice = parseInt(price, 10);
+
+    if (isNaN(parsedPrice)) {
+      return res.status(400).send({ message: 'Invalid price format' });
+    }
+
+    req.body.sanitizedInput = {
+      id,
+      dateStart: parsedDateStart,
+      price: parsedPrice,
+    };
+
+    // Eliminación de propiedades undefined
+    Object.keys(req.body.sanitizedInput).forEach((key) => {
+      if (req.body.sanitizedInput[key] === undefined) {
+        delete req.body.sanitizedInput[key];
+      }
+    });
+
+    next();
+  } catch (error) {
+    return res.status(500).send({ message: 'Error processing input' });
+  }
+}
 function findAll(req: Request, res: Response) {
   res.json({ data: repository.findAll() });
 }
+
 
 function findOne(req: Request, res: Response) {
   const id = req.params.id;
@@ -38,7 +76,6 @@ function add(req: Request, res: Response) {
     input.id,
     input.dateStart,
     input.price,
-
   );
 
   const priceSubscription = repository.add(priceSubscriptionInput);
