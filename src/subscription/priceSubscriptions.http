@@ -11,7 +11,7 @@ Content-Type: application/json
 
 {
   "id": "3",
-  "dateStart": "2024-06-17T00:00:00Z",
+  //"dateStart": "2024-06-17T00:00:00Z",
   "price": "150"
 }
   
@@ -21,7 +21,7 @@ Content-Type: application/json
 
 {
   "id": "2",
-  "dateStart": "2024-05-17T00:00:00Z",
+  //"dateStart": "2024-05-17T00:00:00Z",
   "price": "100"
 }
 
