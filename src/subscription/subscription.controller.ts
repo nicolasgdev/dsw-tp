@@ -3,6 +3,7 @@ import { SubscriptionRepository } from './subscription.repository.js';
 import { Subscription } from './subscription.entity.js';
 //import {findOne as findOnePriceSubscription} from './priceSubscription.controller.js'
 import { PriceSubscriptionRepository } from './priceSubscription.repository.js';
+import { PriceSubscription } from './priceSubscription.entity.js';
 const repository = new SubscriptionRepository();
 const priceSubscriptionRepository = new PriceSubscriptionRepository();
 /*
@@ -22,15 +23,17 @@ function sanitizeSubscriptionInput(req: Request, res: Response, next: NextFuncti
 }
 */
 function sanitizeSubscriptionInput(req: Request, res: Response, next: NextFunction) {
-  const { id, dateStart, price } = req.body;
+  const { id, dateStart, priceValue } = req.body;
 
   // Validación básica
-  if (!id || !dateStart || !price) {
+  if (!id || !dateStart || !priceValue) {
     return res.status(400).send({ message: 'Invalid input data' });
   }
 
   // Manejo de posibles errores en findOnePriceSubscription
-  const priceValue = priceSubscriptionRepository.findOne({ id: price });
+  const today = new Date();
+  const price = new PriceSubscription('1', today, priceValue);
+  const prices : PriceSubscription[]= [price];
   /*
   if (!priceValue) {
     return res.status(400).send({ message: 'Invalid price ID' });
@@ -39,7 +42,7 @@ function sanitizeSubscriptionInput(req: Request, res: Response, next: NextFuncti
   req.body.sanitizedInput = {
     id,
     dateStart: new Date(dateStart),
-    price: priceValue,
+    prices: prices,
   };
 
   // Eliminación de propiedades undefined

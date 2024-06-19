@@ -25,14 +25,18 @@ function sanitizePriceSubscriptionInput(req: Request, res: Response, next: NextF
 
     // Validación básica
     
-    if (!id || !dateStart || !price) {
+    if (!id || !price ) {
       return res.status(400).send({ message: 'Invalid input data' });
     }
 
     // Verificación del tipo de datos
-    const parsedDateStart = new Date(dateStart);
     const parsedPrice = parseInt(price, 10);
-
+    let parsedDateStart: Date;
+    if (dateStart !== undefined) {
+      parsedDateStart = new Date(dateStart);
+    } else {
+      parsedDateStart = new Date();
+    }
     if (isNaN(parsedPrice)) {
       return res.status(400).send({ message: 'Invalid price format' });
     }
