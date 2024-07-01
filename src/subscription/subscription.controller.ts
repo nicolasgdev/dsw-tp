@@ -31,6 +31,16 @@ function sanitizeSubscriptionInput(req: Request, res: Response, next: NextFuncti
   }
 
   // Manejo de posibles errores en findOnePriceSubscription
+  /*
+  function createPriceSubscription(priceValue: number): PriceSubscription {
+    if (!priceValue) {
+      return null;
+    }
+    const today = new Date();
+    return new PriceSubscription('1', today, priceValue);
+  }
+  const price : PriceSubscription[] = [createPriceSubscription(priceValue)];
+  */
   const today = new Date();
   const price = new PriceSubscription('1', today, priceValue);
   const prices : PriceSubscription[]= [price];
